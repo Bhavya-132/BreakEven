@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { demoGoal, demoGoalInputs, demoProfile } from '@/lib/demoData';
-import { loadGoal, loadGoalInputs, loadProfile, loadTransactions, saveGoal, saveGoalInputs, savePlans, saveProfile, saveSnapshot } from '@/lib/storage';
+import { loadGoal, loadGoalInputs, loadPlanContextKey, loadProfile, loadTransactions, saveGoal, saveGoalInputs, savePlanContextKey, savePlans, saveProfile, saveSnapshot } from '@/lib/storage';
 import type { Goal, GoalType, DemoProfile, GoalInputs, RecurringBill, Subscription } from '@/lib/types';
 
 const goalOptions: { type: GoalType; label: string; helper: string }[] = [
@@ -110,6 +110,7 @@ export default function GoalPage() {
     saveGoal(goal);
     saveGoalInputs(normalizeInputs(inputs));
     const transactions = loadTransactions();
+    const planKey = JSON.stringify(normalizeInputs(inputs));
     const payload = transactions.length > 0
       ? { profile, goal, goalInputs: inputs, transactions }
       : { profile, goal, goalInputs: inputs };
@@ -122,6 +123,7 @@ export default function GoalPage() {
       .then((data) => {
         if (data.snapshot) saveSnapshot(data.snapshot);
         if (data.plans) savePlans(data.plans);
+        savePlanContextKey(planKey);
       })
       .finally(() => router.push('/mode'));
   };

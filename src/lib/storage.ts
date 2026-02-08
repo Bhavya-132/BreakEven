@@ -65,6 +65,14 @@ export function loadSnapshot(): Snapshot | null {
   return value ? (JSON.parse(value) as Snapshot) : null;
 }
 
+export function savePlanContextKey(value: string) {
+  localStorage.setItem(key('plan_context'), value);
+}
+
+export function loadPlanContextKey(): string | null {
+  return localStorage.getItem(key('plan_context'));
+}
+
 export function savePlanUpdate(update: PlanUpdate) {
   localStorage.setItem(key(`plan_update_${update.planType}`), JSON.stringify(update));
 }

@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import CategoryDeltaRow from '@/components/CategoryDeltaRow';
 import ChecklistItem from '@/components/ChecklistItem';
 import ProgressBar from '@/components/ProgressBar';
-import { loadGoalInputs, loadPlanUpdate, loadPlans, savePlanUpdate } from '@/lib/storage';
+import { loadGoalInputs, loadPlanContextKey, loadPlanUpdate, loadPlans, loadProfile, loadGoal, loadTransactions, savePlanContextKey, savePlanUpdate, savePlans, saveSnapshot } from '@/lib/storage';
 import type { Plan, PlanType, PlanUpdate } from '@/lib/types';
 
 export default function PlanPage() {
@@ -17,6 +17,9 @@ export default function PlanPage() {
 
   const plans = useMemo(() => loadPlans(), []);
   const plan = plans.find((item) => item.type === active) as Plan | undefined;
+  const profile = loadProfile();
+  const goal = loadGoal();
+  const [loading, setLoading] = useState(false);
   const [update, setUpdate] = useState<PlanUpdate>(() => {
     return (
       loadPlanUpdate(active) || {
@@ -40,6 +43,30 @@ export default function PlanPage() {
       }
     );
   }, [active]);
+
+  useEffect(() => {
+    if (!goalInputs || loading || !profile || !goal) return;
+    const planKey = JSON.stringify(goalInputs);
+    const storedKey = loadPlanContextKey();
+    if (storedKey === planKey && plans.length > 0) return;
+    const transactions = loadTransactions();
+    const payload = transactions.length > 0
+      ? { profile, goal, goalInputs, transactions }
+      : { profile, goal, goalInputs };
+    setLoading(true);
+    fetch('/api/v1/plan/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.plans) savePlans(data.plans);
+        if (data.snapshot) saveSnapshot(data.snapshot);
+        savePlanContextKey(planKey);
+      })
+      .finally(() => setLoading(false));
+  }, [goalInputs, plans.length, loading, profile, goal]);
 
   const handleSaveUpdate = () => {
     const amount = periodSaved === '' ? 0 : Number(periodSaved);

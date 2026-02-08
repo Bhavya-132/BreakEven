@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ProgressBar from '@/components/ProgressBar';
 import CategoryDeltaRow from '@/components/CategoryDeltaRow';
-import { loadGoal, loadGoalInputs, loadPlanUpdate, loadPlans, loadProfile, loadTransactions, savePlans, saveSnapshot } from '@/lib/storage';
+import { loadGoal, loadGoalInputs, loadPlanContextKey, loadPlanUpdate, loadPlans, loadProfile, loadTransactions, savePlanContextKey, savePlans, saveSnapshot } from '@/lib/storage';
 import type { Plan, PlanType } from '@/lib/types';
 
 const monthTasks = [
@@ -33,8 +33,11 @@ export default function ExitModePage() {
   useEffect(() => {
     if (!goalInputs || loading) return;
     if (!profile || !goal) return;
+    const planKey = JSON.stringify(goalInputs);
+    const storedKey = loadPlanContextKey();
     const needsRefresh =
       plans.length === 0 ||
+      storedKey !== planKey ||
       plans.every((p) => p.savedPerMonth === 0 && (p.monthsToGoal === null || p.monthsToGoal === undefined));
 
     if (!needsRefresh) return;
@@ -57,6 +60,7 @@ export default function ExitModePage() {
           setPlans(data.plans);
         }
         if (data.snapshot) saveSnapshot(data.snapshot);
+        savePlanContextKey(planKey);
       })
       .finally(() => setLoading(false));
   }, [goalInputs, plans, loading, profile, goal]);

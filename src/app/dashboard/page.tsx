@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PlanCard from '@/components/PlanCard';
 import ProgressBar from '@/components/ProgressBar';
-import { loadGoal, loadGoalInputs, loadPlans, loadProfile, loadSnapshot, loadTransactions, savePlans, saveSnapshot } from '@/lib/storage';
+import { loadGoal, loadGoalInputs, loadPlanContextKey, loadPlans, loadProfile, loadSnapshot, loadTransactions, savePlanContextKey, savePlans, saveSnapshot } from '@/lib/storage';
 import type { Plan } from '@/lib/types';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
@@ -50,6 +50,7 @@ export default function DashboardPage() {
     }
     setLoading(true);
     const transactions = loadTransactions();
+    const planKey = JSON.stringify(goalInputs);
     const payload = transactions.length > 0
       ? { profile, goal, goalInputs, transactions }
       : { profile, goal, goalInputs };
@@ -62,6 +63,7 @@ export default function DashboardPage() {
     savePlans(data.plans);
     if (data.snapshot) saveSnapshot(data.snapshot);
     setPlans(data.plans);
+    savePlanContextKey(planKey);
     setLoading(false);
     router.push('/plan?type=FAST');
   };

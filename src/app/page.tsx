@@ -3,29 +3,22 @@ import Link from 'next/link';
 export default function HomePage() {
   return (
     <main className="page fade-in">
-        <div className="hero">
-          <div>
-            <span className="pill">Relationship finance toolkit</span>
-            <h1 className="hero-title">Plan a fairer split. Build a private buffer. Leave with clarity.</h1>
-            <p className="subtitle">
-              BreakEven turns shared spending into two actionable plans: a fast path and a steady path, with clear steps.
-            </p>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <section className="home-hero">
+        <div>
+          <span className="pill">Relationship finance toolkit</span>
+          <h1 className="hero-title">Your path to independence.</h1>
+          <p className="subtitle">Clear plans. Real numbers. No guesswork.</p>
+          <div className="hero-cta">
             <Link className="button" href="/goal">Start planning</Link>
             <Link className="button secondary" href="/plan?type=FAST#update">Update progress</Link>
-            </div>
           </div>
-          <div className="card">
-          <h3 style={{ marginTop: 0, fontFamily: 'Fraunces, serif' }}>What you get</h3>
-          <ul className="list">
-            <li>Fast + Steady savings plans with a timeline</li>
-            <li>Category-by-category guidance with plain-English explanations</li>
-            <li>Weekly checklist so you always know the next move</li>
-          </ul>
         </div>
-      </div>
+        <div className="hero-illustration">
+          <img src="/hero.png" alt="Supportive conversation in a calm space" />
+        </div>
+      </section>
 
-      <section style={{ marginTop: 60 }}>
+      <section style={{ marginTop: 40 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <h2 className="section-title" style={{ fontSize: '2rem' }}>Safety & Awareness</h2>
           <p className="subtitle">Understanding the context behind financial planning</p>
@@ -67,6 +60,18 @@ export default function HomePage() {
               <p className="subtitle" style={{ margin: 0 }}>Available 24/7 for confidential support.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="home-band">
+        <div>
+          <h3 style={{ marginTop: 0 }}>BreakEven offers clarity, privacy, and actionable steps.</h3>
+          <p style={{ marginBottom: 0 }}>
+            Get a plan that prioritizes fairness and safety with a calm, step-by-step path forward.
+          </p>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Link className="button" href="/goal">Discover resources</Link>
         </div>
       </section>
     </main>

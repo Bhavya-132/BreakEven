@@ -4,13 +4,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
 :root {
-  --bg: #f7f7f7;
-  --surface: #ffffff;
+  --bg: #f3eef7;
+  --surface: #fffdfc;
   --ink: #1d1b17;
   --muted: #6b6b6b;
-  --accent: #e7a5b4;
-  --accent-2: #c46a7a;
-  --stroke: #e6e6e6;
+  --accent: #d58fb6;
+  --accent-2: #b49adf;
+  --accent-3: #9bc4e8;
+  --stroke: #e8dff0;
   --shadow: 0 20px 60px rgba(15, 15, 15, 0.08);
 }
 
@@ -176,6 +177,133 @@ main {
   align-items: center;
 }
 
+.home-hero {
+  background: #f7edf7;
+  border-radius: 28px;
+  padding: 48px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-gap: 32px;
+  gap: 32px;
+  align-items: center;
+  box-shadow: 0 30px 80px rgba(27, 17, 32, 0.08);
+}
+
+.hero-cta {
+  display: inline-flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.hero-illustration {
+  background: #f9f1fa;
+  border-radius: 24px;
+  padding: 18px;
+  border: 1px solid #e8e0ef;
+  display: grid;
+  place-items: center;
+  min-height: 280px;
+}
+
+.hero-illustration img {
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+}
+
+  /* pastel block instead of gradient */
+.home-band {
+  margin-top: 28px;
+  border-radius: 24px;
+  padding: 32px;
+  background: #d9c2ee;
+  color: #2c2038;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-gap: 20px;
+  gap: 20px;
+  align-items: center;
+}
+
+.home-band .button {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.home-band .button:hover {
+  box-shadow: 0 12px 30px rgba(40, 10, 60, 0.2);
+}
+
+.exit-grid {
+  display: grid;
+  grid-gap: 24px;
+  gap: 24px;
+}
+
+.exit-overview {
+  text-align: center;
+}
+
+.exit-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-gap: 18px;
+  gap: 18px;
+}
+
+.select-card {
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border 0.2s ease, transform 0.2s ease;
+}
+
+.select-card.active {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.timeline {
+  display: grid;
+  grid-gap: 16px;
+  gap: 16px;
+}
+
+.timeline-card {
+  border-left: 4px solid #c8dbe8;
+  padding-left: 16px;
+}
+
+.timeline-card h4 {
+  margin: 0 0 8px;
+}
+
+.delta-grid {
+  display: grid;
+  grid-gap: 10px;
+  gap: 10px;
+}
+
+.weekly-checklist li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.sticky-footer {
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0;
+  background: #ffffff;
+  border-top: 1px solid var(--stroke);
+  padding: 14px 18px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 5;
+}
+
 .hero-title {
   font-family: 'Fraunces', serif;
   font-size: clamp(2.2rem, 4vw, 3.6rem);
@@ -195,6 +323,11 @@ main {
   border-radius: 20px;
   padding: 24px;
   box-shadow: var(--shadow);
+}
+
+.card.color-wash {
+  background: #f4e7f6;
+  border-color: #ead6f1;
 }
 
 .soft-card {
@@ -264,14 +397,14 @@ main {
 }
 
 .button.secondary {
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent-2);
+  background: #f6eef8;
+  border: 1px solid #d9c2ee;
+  color: #6d4c7c;
 }
 
 .button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(27, 111, 106, 0.2);
+  box-shadow: 0 10px 30px rgba(196, 160, 210, 0.25);
 }
 
 .pill {
@@ -280,7 +413,7 @@ main {
   gap: 8px;
   padding: 6px 12px;
   border-radius: 999px;
-  background: #f0f0f0;
+  background: #efe2f2;
   color: var(--muted);
   font-size: 0.85rem;
 }
@@ -310,7 +443,7 @@ main {
 .progress > span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), #2f8c86);
+  background: #a9c9e9;
 }
 
 .list {
@@ -337,7 +470,7 @@ main {
   display: inline-flex;
   gap: 8px;
   padding: 4px;
-  background: #f0f0f0;
+  background: #ede2f2;
   border-radius: 999px;
 }
 
@@ -372,7 +505,7 @@ main {
   inset: -20% auto auto -10%;
   width: 60vw;
   height: 60vw;
-  background: radial-gradient(circle at 30% 30%, rgba(231, 165, 180, 0.2), transparent 70%);
+  background: radial-gradient(circle at 30% 30%, rgba(213, 143, 182, 0.18), transparent 70%);
   z-index: -1;
 }
 
@@ -380,6 +513,6 @@ main {
   inset: auto -10% -20% auto;
   width: 50vw;
   height: 50vw;
-  background: radial-gradient(circle at 70% 70%, rgba(200, 210, 220, 0.25), transparent 70%);
+  background: radial-gradient(circle at 70% 70%, rgba(155, 196, 232, 0.2), transparent 70%);
 }
 

@@ -45,10 +45,18 @@ export function buildMonthlySnapshot(goalInputs: GoalInputs, transactions: PlanI
   const fixedSpend = goalInputs.recurringBills.reduce((sum, bill) => sum + bill.amount, 0);
   const subsSpend = goalInputs.subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
 
-  transactions.forEach((tx) => {
-    if (tx.amount <= 0) return;
-    spendByCategory[tx.category] = (spendByCategory[tx.category] || 0) + tx.amount;
-  });
+  if (goalInputs.variableSpendByCategory) {
+    spendByCategory.FOOD = goalInputs.variableSpendByCategory.FOOD;
+    spendByCategory.SHOPPING = goalInputs.variableSpendByCategory.SHOPPING;
+    spendByCategory.ENTERTAINMENT = goalInputs.variableSpendByCategory.ENTERTAINMENT;
+    spendByCategory.TRANSPORT = goalInputs.variableSpendByCategory.TRANSPORT;
+    spendByCategory.OTHER = goalInputs.variableSpendByCategory.OTHER;
+  } else {
+    transactions.forEach((tx) => {
+      if (tx.amount <= 0) return;
+      spendByCategory[tx.category] = (spendByCategory[tx.category] || 0) + tx.amount;
+    });
+  }
 
   const variableSpend = ['FOOD', 'SHOPPING', 'ENTERTAINMENT', 'TRANSPORT', 'OTHER'].reduce(
     (sum, category) => sum + (spendByCategory[category] || 0),

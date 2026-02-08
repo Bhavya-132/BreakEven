@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { demoGoal, demoGoalInputs, demoProfile } from '@/lib/demoData';
 import { loadGoal, loadGoalInputs, loadProfile, loadTransactions, saveGoal, saveGoalInputs, savePlans, saveProfile, saveSnapshot } from '@/lib/storage';
@@ -17,6 +17,8 @@ export default function GoalPage() {
   const [profile, setProfile] = useState<DemoProfile>(demoProfile);
   const [goal, setGoal] = useState<Goal>(demoGoal);
   const [inputs, setInputs] = useState<GoalInputs>(demoGoalInputs);
+  const sections = useMemo(() => ['income', 'goal', 'bills', 'subs', 'variable'], []);
+  const [activeSection, setActiveSection] = useState<string>('income');
 
   const makeId = () => {
     if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -34,7 +36,14 @@ export default function GoalPage() {
     subscriptions: value.subscriptions.map((sub) => ({
       ...sub,
       id: sub.id ?? makeId()
-    }))
+    })),
+    variableSpendByCategory: value.variableSpendByCategory ?? {
+      FOOD: 0,
+      SHOPPING: 0,
+      ENTERTAINMENT: 0,
+      TRANSPORT: 0,
+      OTHER: 0
+    }
   });
 
   const displayNumber = (value: number) => (value === 0 ? '' : value);
@@ -45,8 +54,52 @@ export default function GoalPage() {
     const storedInputs = loadGoalInputs();
     if (storedProfile) setProfile(storedProfile);
     if (storedGoal) setGoal(storedGoal);
-    if (storedInputs) setInputs(normalizeInputs(storedInputs));
+    if (storedInputs) {
+      setInputs(normalizeInputs(storedInputs));
+    } else {
+      const txs = loadTransactions();
+      if (txs.length > 0) {
+        const totals = txs.reduce(
+          (acc, tx) => {
+            if (tx.amount <= 0) return acc;
+            if (tx.category in acc) {
+              acc[tx.category as keyof typeof acc] += tx.amount;
+            }
+            return acc;
+          },
+          { FOOD: 0, SHOPPING: 0, ENTERTAINMENT: 0, TRANSPORT: 0, OTHER: 0 }
+        );
+        setInputs((prev) => normalizeInputs({ ...prev, variableSpendByCategory: totals }));
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    const elements = sections
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[];
+
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => {
+            const aTop = (a.target as HTMLElement).getBoundingClientRect().top;
+            const bTop = (b.target as HTMLElement).getBoundingClientRect().top;
+            return aTop - bTop;
+          });
+        if (visible[0]?.target?.id) {
+          setActiveSection(visible[0].target.id);
+        }
+      },
+      { rootMargin: '-30% 0px -50% 0px', threshold: [0, 0.1, 0.25, 0.5] }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [sections]);
 
   const updateProfile = (patch: Partial<DemoProfile>) => {
     setProfile((prev) => ({ ...prev, ...patch }));
@@ -57,10 +110,13 @@ export default function GoalPage() {
     saveGoal(goal);
     saveGoalInputs(normalizeInputs(inputs));
     const transactions = loadTransactions();
+    const payload = transactions.length > 0
+      ? { profile, goal, goalInputs: inputs, transactions }
+      : { profile, goal, goalInputs: inputs };
     fetch('/api/v1/plan/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profile, goal, goalInputs: inputs, transactions })
+      body: JSON.stringify(payload)
     })
       .then((res) => res.json())
       .then((data) => {
@@ -107,10 +163,11 @@ export default function GoalPage() {
 
       <div className="goal-layout">
         <aside className="side-tabs">
-          <a href="#income" className="active">Income</a>
-          <a href="#goal">Goal</a>
-          <a href="#bills">Bills</a>
-          <a href="#subs">Subscriptions</a>
+          <a href="#income" className={activeSection === 'income' ? 'active' : ''}>Income</a>
+          <a href="#goal" className={activeSection === 'goal' ? 'active' : ''}>Goal</a>
+          <a href="#bills" className={activeSection === 'bills' ? 'active' : ''}>Bills</a>
+          <a href="#subs" className={activeSection === 'subs' ? 'active' : ''}>Subscriptions</a>
+          <a href="#variable" className={activeSection === 'variable' ? 'active' : ''}>Spending</a>
         </aside>
         <div className="goal-content">
           <section id="income">
@@ -303,6 +360,34 @@ export default function GoalPage() {
           >
             Add subscription
           </button>
+            </div>
+          </section>
+
+          <section id="variable">
+            <div className="card">
+              <h3 style={{ marginTop: 0 }}>Monthly variable spending (editable)</h3>
+              <p className="subtitle">Prefilled from demo data. Adjust to match your reality.</p>
+              <div className="grid grid-2">
+                {(['FOOD', 'SHOPPING', 'ENTERTAINMENT', 'TRANSPORT', 'OTHER'] as const).map((key) => (
+                  <label key={key} style={{ display: 'grid', gap: 6 }}>
+                    {key.toLowerCase()}
+                    <input
+                      type="number"
+                      value={displayNumber(inputs.variableSpendByCategory[key])}
+                      onChange={(e) =>
+                        setInputs((prev) => ({
+                          ...prev,
+                          variableSpendByCategory: {
+                            ...prev.variableSpendByCategory,
+                            [key]: e.target.value === '' ? 0 : Number(e.target.value)
+                          }
+                        }))
+                      }
+                      style={{ padding: 10, borderRadius: 10, border: '1px solid var(--stroke)' }}
+                    />
+                  </label>
+                ))}
+              </div>
             </div>
           </section>
         </div>

@@ -1,8 +1,10 @@
 {
-  "/plan/page": "app/plan/page.js",
-  "/page": "app/page.js",
-  "/balance/page": "app/balance/page.js",
-  "/api/v1/plan/generate/route": "app/api/v1/plan/generate/route.js",
   "/goal/page": "app/goal/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
+  "/exit/page": "app/exit/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/page": "app/page.js",
+  "/mode/page": "app/mode/page.js",
+  "/plan/page": "app/plan/page.js",
+  "/api/v1/plan/generate/route": "app/api/v1/plan/generate/route.js",
+  "/balance/page": "app/balance/page.js"
 }

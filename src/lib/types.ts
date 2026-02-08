@@ -55,6 +55,13 @@ export type GoalInputs = {
   currentBuffer: number;
   recurringBills: RecurringBill[];
   subscriptions: Subscription[];
+  variableSpendByCategory: {
+    FOOD: number;
+    SHOPPING: number;
+    ENTERTAINMENT: number;
+    TRANSPORT: number;
+    OTHER: number;
+  };
 };
 
 export type CategoryDelta = {

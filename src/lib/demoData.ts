@@ -39,7 +39,14 @@ export const demoGoalInputs: GoalInputs = {
   subscriptions: [
     { id: 'sub_streamly', name: 'Streamly', amount: 18 },
     { id: 'sub_cloud', name: 'Cloud storage', amount: 9 }
-  ]
+  ],
+  variableSpendByCategory: {
+    FOOD: 750,
+    SHOPPING: 290,
+    ENTERTAINMENT: 90,
+    TRANSPORT: 220,
+    OTHER: 1895
+  }
 };
 
 export const demoTransactions: Transaction[] = [

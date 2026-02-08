@@ -19,6 +19,10 @@ export default function ModePage() {
       profile.user.mode = selected;
       saveProfile(profile);
     }
+    if (selected === 'EXIT') {
+      router.push('/exit');
+      return;
+    }
     router.push('/dashboard');
   };
 

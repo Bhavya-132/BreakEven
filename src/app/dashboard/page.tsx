@@ -50,10 +50,13 @@ export default function DashboardPage() {
     }
     setLoading(true);
     const transactions = loadTransactions();
+    const payload = transactions.length > 0
+      ? { profile, goal, goalInputs, transactions }
+      : { profile, goal, goalInputs };
     const res = await fetch('/api/v1/plan/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profile, goal, goalInputs, transactions })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
     savePlans(data.plans);

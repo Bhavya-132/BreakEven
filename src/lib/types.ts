@@ -35,12 +35,14 @@ export type Goal = {
 };
 
 export type RecurringBill = {
+  id: string;
   name: string;
   amount: number;
   category: 'HOUSING' | 'UTILITIES' | 'DEBT' | 'INSURANCE' | 'OTHER_FIXED';
 };
 
 export type Subscription = {
+  id: string;
   name: string;
   amount: number;
   essential?: boolean;
@@ -102,4 +104,11 @@ export type Snapshot = {
   totalSpend: number;
   baselineSavings: number;
   deficit: number;
+};
+
+export type PlanUpdate = {
+  planType: PlanType;
+  cadence: 'WEEKLY' | 'BIWEEKLY';
+  lastUpdate: string;
+  savedSoFar: number;
 };

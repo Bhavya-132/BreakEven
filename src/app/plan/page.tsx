@@ -1,20 +1,59 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import CategoryDeltaRow from '@/components/CategoryDeltaRow';
 import ChecklistItem from '@/components/ChecklistItem';
-import { loadPlans } from '@/lib/storage';
-import type { Plan, PlanType } from '@/lib/types';
+import ProgressBar from '@/components/ProgressBar';
+import { loadGoalInputs, loadPlanUpdate, loadPlans, savePlanUpdate } from '@/lib/storage';
+import type { Plan, PlanType, PlanUpdate } from '@/lib/types';
 
 export default function PlanPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const defaultType = (searchParams.get('type') as PlanType) || 'FAST';
   const [active, setActive] = useState<PlanType>(defaultType);
+  const goalInputs = loadGoalInputs();
 
   const plans = useMemo(() => loadPlans(), []);
   const plan = plans.find((item) => item.type === active) as Plan | undefined;
+  const [update, setUpdate] = useState<PlanUpdate>(() => {
+    return (
+      loadPlanUpdate(active) || {
+        planType: active,
+        cadence: 'WEEKLY',
+        lastUpdate: '',
+        savedSoFar: 0
+      }
+    );
+  });
+  const [periodSaved, setPeriodSaved] = useState('');
+
+  useEffect(() => {
+    const stored = loadPlanUpdate(active);
+    setUpdate(
+      stored || {
+        planType: active,
+        cadence: 'WEEKLY',
+        lastUpdate: '',
+        savedSoFar: 0
+      }
+    );
+  }, [active]);
+
+  const handleSaveUpdate = () => {
+    const amount = periodSaved === '' ? 0 : Number(periodSaved);
+    const total = Math.max(0, update.savedSoFar + amount);
+    const nextUpdate = {
+      planType: active,
+      cadence: update.cadence,
+      lastUpdate: new Date().toISOString(),
+      savedSoFar: total
+    };
+    savePlanUpdate(nextUpdate);
+    setUpdate(nextUpdate);
+    setPeriodSaved('');
+  };
 
   if (!plan) {
     return (
@@ -81,6 +120,53 @@ export default function PlanPage() {
             {plan.deltasByCategory.map((delta) => (
               <CategoryDeltaRow key={delta.category} delta={delta} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="update" style={{ marginTop: 32 }}>
+        <h2 className="section-title">Update progress</h2>
+        <div className="card">
+          <div style={{ display: 'grid', gap: 16 }}>
+            <label style={{ display: 'grid', gap: 6 }}>
+              Update cadence
+              <select
+                value={update.cadence}
+                onChange={(e) => setUpdate((prev) => ({ ...prev, cadence: e.target.value as PlanUpdate['cadence'] }))}
+                style={{ padding: 10, borderRadius: 10, border: '1px solid var(--stroke)' }}
+              >
+                <option value="WEEKLY">Weekly</option>
+                <option value="BIWEEKLY">Biweekly</option>
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: 6 }}>
+              Amount saved since last check-in
+              <input
+                type="number"
+                value={periodSaved}
+                onChange={(e) => setPeriodSaved(e.target.value)}
+                style={{ padding: 10, borderRadius: 10, border: '1px solid var(--stroke)' }}
+              />
+            </label>
+            <button className="button" onClick={handleSaveUpdate}>Save update</button>
+          </div>
+          <div style={{ marginTop: 20 }}>
+            <p className="subtitle" style={{ marginBottom: 8 }}>
+              Total saved so far: ${update.savedSoFar}
+            </p>
+            {goalInputs && (
+              <>
+                <ProgressBar value={(update.savedSoFar / goalInputs.targetAmount) * 100} />
+                <p className="subtitle" style={{ marginTop: 8, marginBottom: 0 }}>
+                  Target: ${goalInputs.targetAmount}
+                </p>
+              </>
+            )}
+            {update.lastUpdate && (
+              <p style={{ marginTop: 8, color: 'var(--muted)' }}>
+                Last update: {new Date(update.lastUpdate).toLocaleDateString()}
+              </p>
+            )}
           </div>
         </div>
       </section>

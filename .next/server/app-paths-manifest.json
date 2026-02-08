@@ -1,8 +1,8 @@
 {
-  "/goal/page": "app/goal/page.js",
   "/plan/page": "app/plan/page.js",
   "/page": "app/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
   "/balance/page": "app/balance/page.js",
-  "/mode/page": "app/mode/page.js"
+  "/api/v1/plan/generate/route": "app/api/v1/plan/generate/route.js",
+  "/goal/page": "app/goal/page.js",
+  "/dashboard/page": "app/dashboard/page.js"
 }

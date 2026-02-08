@@ -1,4 +1,4 @@
-import type { DemoProfile, Goal, GoalInputs, Plan, Snapshot, Transaction, Mode } from '@/lib/types';
+import type { DemoProfile, Goal, GoalInputs, Plan, PlanUpdate, Snapshot, Transaction, Mode } from '@/lib/types';
 
 const key = (name: string) => `breakeven_${name}`;
 
@@ -63,4 +63,13 @@ export function saveSnapshot(snapshot: Snapshot) {
 export function loadSnapshot(): Snapshot | null {
   const value = localStorage.getItem(key('snapshot'));
   return value ? (JSON.parse(value) as Snapshot) : null;
+}
+
+export function savePlanUpdate(update: PlanUpdate) {
+  localStorage.setItem(key(`plan_update_${update.planType}`), JSON.stringify(update));
+}
+
+export function loadPlanUpdate(planType: PlanUpdate['planType']): PlanUpdate | null {
+  const value = localStorage.getItem(key(`plan_update_${planType}`));
+  return value ? (JSON.parse(value) as PlanUpdate) : null;
 }

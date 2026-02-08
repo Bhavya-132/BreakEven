@@ -32,13 +32,13 @@ export const demoGoalInputs: GoalInputs = {
   targetAmount: 3000,
   currentBuffer: 600,
   recurringBills: [
-    { name: 'Rent', amount: 1200, category: 'HOUSING' },
-    { name: 'Utilities', amount: 180, category: 'UTILITIES' },
-    { name: 'Insurance', amount: 120, category: 'INSURANCE' }
+    { id: 'bill_rent', name: 'Rent', amount: 1200, category: 'HOUSING' },
+    { id: 'bill_utilities', name: 'Utilities', amount: 180, category: 'UTILITIES' },
+    { id: 'bill_insurance', name: 'Insurance', amount: 120, category: 'INSURANCE' }
   ],
   subscriptions: [
-    { name: 'Streamly', amount: 18 },
-    { name: 'Cloud storage', amount: 9 }
+    { id: 'sub_streamly', name: 'Streamly', amount: 18 },
+    { id: 'sub_cloud', name: 'Cloud storage', amount: 9 }
   ]
 };
 

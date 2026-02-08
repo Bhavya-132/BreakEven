@@ -67,12 +67,57 @@ main {
   align-items: center;
 }
 
-.nav-links a {
+.nav-links a,
+.nav-link {
   font-weight: 500;
   color: var(--muted);
 }
 
-.nav-links a.active {
+.nav-links a.active,
+.nav-link.active {
+  color: var(--ink);
+}
+
+.nav-item {
+  position: relative;
+}
+
+.nav-item:hover .nav-dropdown,
+.nav-item:focus-within .nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 10px;
+  background: white;
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 10px;
+  display: grid;
+  grid-gap: 8px;
+  gap: 8px;
+  min-width: 160px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: all 0.2s ease;
+  z-index: 20;
+}
+
+.nav-dropdown a {
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: var(--muted);
+}
+
+.nav-dropdown a:hover {
+  background: #f4f4f4;
   color: var(--ink);
 }
 
@@ -150,6 +195,47 @@ main {
   border-radius: 20px;
   padding: 24px;
   box-shadow: var(--shadow);
+}
+
+.soft-card {
+  background: #faf9fb;
+  border: 1px solid #ece9ef;
+  box-shadow: 0 14px 40px rgba(15, 15, 15, 0.08);
+}
+
+.icon-pill {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.icon-warn {
+  background: #fff1dc;
+  color: #c47b2a;
+}
+
+.icon-heart {
+  background: #fbe7ee;
+  color: #d2476b;
+}
+
+.icon-shield {
+  background: #e6f1fb;
+  color: #2e6ea4;
+}
+
+.alert-card {
+  border: 2px solid #ef6a6a;
+  background: #fff2f2;
+  color: #5b2b2b;
+}
+
+.alert-card strong {
+  color: #c83e3e;
 }
 
 .grid {

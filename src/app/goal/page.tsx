@@ -18,13 +18,34 @@ export default function GoalPage() {
   const [goal, setGoal] = useState<Goal>(demoGoal);
   const [inputs, setInputs] = useState<GoalInputs>(demoGoalInputs);
 
+  const makeId = () => {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      return crypto.randomUUID();
+    }
+    return `id_${Math.random().toString(36).slice(2, 9)}`;
+  };
+
+  const normalizeInputs = (value: GoalInputs): GoalInputs => ({
+    ...value,
+    recurringBills: value.recurringBills.map((bill) => ({
+      ...bill,
+      id: bill.id ?? makeId()
+    })),
+    subscriptions: value.subscriptions.map((sub) => ({
+      ...sub,
+      id: sub.id ?? makeId()
+    }))
+  });
+
+  const displayNumber = (value: number) => (value === 0 ? '' : value);
+
   useEffect(() => {
     const storedProfile = loadProfile();
     const storedGoal = loadGoal();
     const storedInputs = loadGoalInputs();
     if (storedProfile) setProfile(storedProfile);
     if (storedGoal) setGoal(storedGoal);
-    if (storedInputs) setInputs(storedInputs);
+    if (storedInputs) setInputs(normalizeInputs(storedInputs));
   }, []);
 
   const updateProfile = (patch: Partial<DemoProfile>) => {
@@ -34,7 +55,7 @@ export default function GoalPage() {
   const handleSave = () => {
     saveProfile(profile);
     saveGoal(goal);
-    saveGoalInputs(inputs);
+    saveGoalInputs(normalizeInputs(inputs));
     const transactions = loadTransactions();
     fetch('/api/v1/plan/generate', {
       method: 'POST',
@@ -98,30 +119,40 @@ export default function GoalPage() {
           <div style={{ display: 'grid', gap: 18 }}>
             <label style={{ display: 'grid', gap: 6 }}>
               Monthly income
-              <input
-                type="number"
-                value={inputs.incomeMonthly}
-                onChange={(e) => setInputs((prev) => ({ ...prev, incomeMonthly: Number(e.target.value) }))}
-                style={{ padding: 10, borderRadius: 10, border: '1px solid var(--stroke)' }}
-              />
+            <input
+              type="number"
+              value={displayNumber(inputs.incomeMonthly)}
+              onChange={(e) =>
+                setInputs((prev) => ({
+                  ...prev,
+                  incomeMonthly: e.target.value === '' ? 0 : Number(e.target.value)
+                }))
+              }
+              style={{ padding: 10, borderRadius: 10, border: '1px solid var(--stroke)' }}
+            />
             </label>
             <label style={{ display: 'grid', gap: 6 }}>
               Current buffer
-              <input
-                type="number"
-                value={inputs.currentBuffer}
-                onChange={(e) => setInputs((prev) => ({ ...prev, currentBuffer: Number(e.target.value) }))}
-                style={{ padding: 10, borderRadius: 10, border: '1px solid var(--stroke)' }}
-              />
+            <input
+              type="number"
+              value={displayNumber(inputs.currentBuffer)}
+              onChange={(e) =>
+                setInputs((prev) => ({
+                  ...prev,
+                  currentBuffer: e.target.value === '' ? 0 : Number(e.target.value)
+                }))
+              }
+              style={{ padding: 10, borderRadius: 10, border: '1px solid var(--stroke)' }}
+            />
             </label>
             <label style={{ display: 'grid', gap: 6 }}>
               Partner income (optional)
-              <input
-                type="number"
-                value={profile.partnerIncome ?? 0}
-                onChange={(e) => updateProfile({ partnerIncome: Number(e.target.value) || 0 })}
-                style={{ padding: 10, borderRadius: 10, border: '1px solid var(--stroke)' }}
-              />
+            <input
+              type="number"
+              value={profile.partnerIncome ?? 0}
+              onChange={(e) => updateProfile({ partnerIncome: Number(e.target.value) || 0 })}
+              style={{ padding: 10, borderRadius: 10, border: '1px solid var(--stroke)' }}
+            />
             </label>
             <label style={{ display: 'grid', gap: 6 }}>
               People in household
@@ -158,9 +189,9 @@ export default function GoalPage() {
             Target amount
             <input
               type="number"
-              value={inputs.targetAmount}
+              value={displayNumber(inputs.targetAmount)}
               onChange={(e) => {
-                const value = Number(e.target.value);
+                const value = e.target.value === '' ? 0 : Number(e.target.value);
                 setGoal((prev) => ({ ...prev, targetAmount: value }));
                 setInputs((prev) => ({ ...prev, targetAmount: value }));
               }}
@@ -175,7 +206,7 @@ export default function GoalPage() {
           <h3 style={{ marginTop: 0 }}>Recurring bills</h3>
           <div className="list" style={{ gap: 16 }}>
             {inputs.recurringBills.map((bill, index) => (
-              <div key={`${bill.name}-${index}`} className="card" style={{ boxShadow: 'none' }}>
+              <div key={bill.id} className="card" style={{ boxShadow: 'none' }}>
                 <label style={{ display: 'grid', gap: 6, marginBottom: 12 }}>
                   Name
                   <input
@@ -188,8 +219,10 @@ export default function GoalPage() {
                   Amount
                   <input
                     type="number"
-                    value={bill.amount}
-                    onChange={(e) => updateBill(index, { amount: Number(e.target.value) })}
+                    value={displayNumber(bill.amount)}
+                    onChange={(e) =>
+                      updateBill(index, { amount: e.target.value === '' ? 0 : Number(e.target.value) })
+                    }
                     style={{ padding: 8, borderRadius: 8, border: '1px solid var(--stroke)' }}
                   />
                 </label>
@@ -217,7 +250,10 @@ export default function GoalPage() {
             onClick={() =>
               setInputs((prev) => ({
                 ...prev,
-                recurringBills: [...prev.recurringBills, { name: 'New bill', amount: 0, category: 'OTHER_FIXED' }]
+                recurringBills: [
+                  ...prev.recurringBills,
+                  { id: makeId(), name: 'New bill', amount: 0, category: 'OTHER_FIXED' }
+                ]
               }))
             }
           >
@@ -231,7 +267,7 @@ export default function GoalPage() {
           <h3 style={{ marginTop: 0 }}>Subscriptions</h3>
           <div className="list" style={{ gap: 16 }}>
             {inputs.subscriptions.map((sub, index) => (
-              <div key={`${sub.name}-${index}`} className="card" style={{ boxShadow: 'none' }}>
+              <div key={sub.id} className="card" style={{ boxShadow: 'none' }}>
                 <label style={{ display: 'grid', gap: 6, marginBottom: 12 }}>
                   Name
                   <input
@@ -244,8 +280,10 @@ export default function GoalPage() {
                   Amount
                   <input
                     type="number"
-                    value={sub.amount}
-                    onChange={(e) => updateSubscription(index, { amount: Number(e.target.value) })}
+                    value={displayNumber(sub.amount)}
+                    onChange={(e) =>
+                      updateSubscription(index, { amount: e.target.value === '' ? 0 : Number(e.target.value) })
+                    }
                     style={{ padding: 8, borderRadius: 8, border: '1px solid var(--stroke)' }}
                   />
                 </label>
@@ -259,7 +297,7 @@ export default function GoalPage() {
             onClick={() =>
               setInputs((prev) => ({
                 ...prev,
-                subscriptions: [...prev.subscriptions, { name: 'New subscription', amount: 0 }]
+                subscriptions: [...prev.subscriptions, { id: makeId(), name: 'New subscription', amount: 0 }]
               }))
             }
           >
